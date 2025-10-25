@@ -1,17 +1,20 @@
 const express = require('express');
 const router = express.Router();
-// Implemente o controller de tipoQuarto seguindo o padrão dos outros
-// const tipoQuartoController = require('../controllers/tipoQuarto.controller');
 const authMiddleware = require('../middleware/auth.middleware');
-
-// Simulação de um controller para simplificar
 const { tipoQuarto } = require('../data/database');
+const ApiError = require('../errors/ApiError'); // Importa o ApiError
 
-// Protegendo rotas de gerenciamento
 router.use('/tipos-quarto', authMiddleware);
 
 router.post('/tipos-quarto', (req, res) => {
     const { tipo, capacidade, descricao } = req.body;
+    if (!tipo || !capacidade || !descricao) {
+        throw new ApiError("Campos 'tipo', 'capacidade' e 'descricao' são obrigatórios.", 400);
+    }
+    if (tipoQuarto.some(tq => tq.tipo === tipo)) {
+        throw new ApiError(`O tipo de quarto '${tipo}' já existe.`, 409);
+    }
+
     const id = tipoQuarto.length > 0 ? tipoQuarto[tipoQuarto.length - 1].id + 1 : 1;
     const novoTipo = { id, tipo, capacidade, descricao };
     tipoQuarto.push(novoTipo);

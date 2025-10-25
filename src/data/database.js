@@ -16,12 +16,12 @@ const clientes = [];
 const reservas = [];
 
 class CadastrarCliente {
-    constructor(id, nome, email, telefone, senha) { // Adicionado 'senha'
+    constructor(id, nome, email, telefone, senha) { 
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.telefone = telefone;
-        this.senha = senha; // Adicionado 'senha'
+        this.senha = senha; 
     }
 };
 

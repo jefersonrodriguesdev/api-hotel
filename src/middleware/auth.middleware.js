@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const secret = 'seu-segredo-super-secreto-para-o-jwt'; // Use uma variável de ambiente em projetos reais
+const secret = 'seu-segredo-super-secreto-para-o-jwt'; 
 
 const authMiddleware = (req, res, next) => {
     const authHeader = req.headers.authorization;

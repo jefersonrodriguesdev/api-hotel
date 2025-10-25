@@ -1,29 +1,24 @@
 const quartoRepository = require('../repositories/quarto.repository');
 const tipoQuartoRepository = require('../repositories/tipoQuarto.repository');
 const reservaRepository = require('../repositories/reserva.repository');
+const ApiError = require('../errors/ApiError'); // Importa o ApiError
 
 const criarReserva = async (dadosReserva) => {
     const { numeroQuarto, quantidadePessoas, dataEntrada, dataSaida } = dadosReserva;
 
     const quarto = await quartoRepository.findByNumero(numeroQuarto);
     if (!quarto) {
-        const erro = new Error("Quarto não encontrado.");
-        erro.statusCode = 404;
-        throw erro;
+        throw new ApiError("Quarto não encontrado.", 404);
     }
 
     const infoTipoQuarto = await tipoQuartoRepository.findByTipo(quarto.tipo);
     if (quantidadePessoas > infoTipoQuarto.capacidade) {
-        const erro = new Error(`A quantidade de pessoas excede a capacidade do quarto (${infoTipoQuarto.capacidade}).`);
-        erro.statusCode = 400; 
-        throw erro;
+        throw new ApiError(`A quantidade de pessoas excede a capacidade do quarto (${infoTipoQuarto.capacidade}).`, 400);
     }
 
     const reservasConflitantes = await reservaRepository.findConflito(numeroQuarto, dataEntrada, dataSaida);
     if (reservasConflitantes.length > 0) {
-        const erro = new Error("Este quarto já está reservado para o período solicitado.");
-        erro.statusCode = 409; // Conflict
-        throw erro;
+        throw new ApiError("Este quarto já está reservado para o período solicitado.", 409);
     }
 
     const novaReserva = await reservaRepository.create(dadosReserva);
@@ -37,39 +32,29 @@ const listarReservas = async () => {
 const buscarReservaPorId = async (id) => {
     const reserva = await reservaRepository.findById(id);
     if (!reserva) {
-        const erro = new Error("Reserva não encontrada.");
-        erro.statusCode = 404;
-        throw erro;
+        throw new ApiError("Reserva não encontrada.", 404);
     }
     return reserva;
 };
 
 const atualizarReserva = async (id, dadosReserva) => {
-    // Re-valida as regras de negócio ao atualizar
     const { numeroQuarto, quantidadePessoas, dataEntrada, dataSaida } = dadosReserva;
 
-    await buscarReservaPorId(id); // Garante que a reserva existe
+    await buscarReservaPorId(id); // Garante que a reserva existe (já lança 404 se não existir)
 
     const quarto = await quartoRepository.findByNumero(numeroQuarto);
     if (!quarto) {
-        const erro = new Error("Quarto não encontrado.");
-        erro.statusCode = 404;
-        throw erro;
+        throw new ApiError("Quarto não encontrado.", 404);
     }
 
     const infoTipoQuarto = await tipoQuartoRepository.findByTipo(quarto.tipo);
     if (quantidadePessoas > infoTipoQuarto.capacidade) {
-        const erro = new Error(`A quantidade de pessoas excede a capacidade do quarto (${infoTipoQuarto.capacidade}).`);
-        erro.statusCode = 400; 
-        throw erro;
+        throw new ApiError(`A quantidade de pessoas excede a capacidade do quarto (${infoTipoQuarto.capacidade}).`, 400);
     }
     
-    // Na verificação de conflito, ignoramos a própria reserva que está sendo atualizada
     const reservasConflitantes = await reservaRepository.findConflito(numeroQuarto, dataEntrada, dataSaida, id);
     if (reservasConflitantes.length > 0) {
-        const erro = new Error("Este quarto já está reservado para o período solicitado.");
-        erro.statusCode = 409; // Conflict
-        throw erro;
+        throw new ApiError("Este quarto já está reservado para o período solicitado.", 409);
     }
 
     return await reservaRepository.update(id, dadosReserva);
@@ -78,9 +63,7 @@ const atualizarReserva = async (id, dadosReserva) => {
 const deletarReserva = async (id) => {
     const sucesso = await reservaRepository.remove(id);
     if (!sucesso) {
-        const erro = new Error("Reserva não encontrada.");
-        erro.statusCode = 404;
-        throw erro;
+        throw new ApiError("Reserva não encontrada.", 404);
     }
     return sucesso;
 };
