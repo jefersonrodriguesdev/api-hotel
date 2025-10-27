@@ -1,8 +1,9 @@
-const express = require('express');
+import express from 'express';
+import authMiddleware from '../middleware/auth.middleware.js';
+import { clientes } from '../data/database.js';
+import ApiError from '../errors/ApiError.js';
+
 const router = express.Router();
-const authMiddleware = require('../middleware/auth.middleware');
-const { clientes } = require('../data/database');
-const ApiError = require('../errors/ApiError'); // Importa o ApiError
 
 router.use('/clientes', authMiddleware);
 
@@ -53,4 +54,4 @@ router.delete('/clientes/:id', (req, res) => {
     res.status(200).json({ message: "Cliente deletado com sucesso." });
 });
 
-module.exports = router;
+export default router;

@@ -1,7 +1,7 @@
-const quartoRepository = require('../repositories/quarto.repository');
-const tipoQuartoRepository = require('../repositories/tipoQuarto.repository');
-const reservaRepository = require('../repositories/reserva.repository');
-const ApiError = require('../errors/ApiError'); // Importa o ApiError
+import quartoRepository from '../repositories/quarto.repository.js';
+import tipoQuartoRepository from '../repositories/tipoQuarto.repository.js';
+import reservaRepository from '../repositories/reserva.repository.js';
+import ApiError from '../errors/ApiError.js';
 
 const criarReserva = async (dadosReserva) => {
     const { numeroQuarto, quantidadePessoas, dataEntrada, dataSaida } = dadosReserva;
@@ -40,7 +40,7 @@ const buscarReservaPorId = async (id) => {
 const atualizarReserva = async (id, dadosReserva) => {
     const { numeroQuarto, quantidadePessoas, dataEntrada, dataSaida } = dadosReserva;
 
-    await buscarReservaPorId(id); // Garante que a reserva existe (já lança 404 se não existir)
+    await buscarReservaPorId(id); 
 
     const quarto = await quartoRepository.findByNumero(numeroQuarto);
     if (!quarto) {
@@ -68,7 +68,7 @@ const deletarReserva = async (id) => {
     return sucesso;
 };
 
-module.exports = {
+export default {
     criarReserva,
     listarReservas,
     buscarReservaPorId,

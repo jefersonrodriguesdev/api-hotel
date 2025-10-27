@@ -1,5 +1,5 @@
-const usuarioService = require('../services/usuario.service');
-const ApiError = require('../errors/ApiError'); // Importa o ApiError
+import usuarioService from '../services/usuario.service.js';
+import ApiError from '../errors/ApiError.js';
 
 const registrar = async (req, res) => {
     const { nome, email, telefone, senha } = req.body;
@@ -19,4 +19,4 @@ const login = async (req, res) => {
     return res.status(200).json(dadosLogin);
 };
 
-module.exports = { registrar, login };
+export default { registrar, login };

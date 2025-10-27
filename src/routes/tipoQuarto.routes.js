@@ -1,8 +1,9 @@
-const express = require('express');
+import express from 'express';
+import authMiddleware from '../middleware/auth.middleware.js';
+import { tipoQuarto } from '../data/database.js';
+import ApiError from '../errors/ApiError.js';
+
 const router = express.Router();
-const authMiddleware = require('../middleware/auth.middleware');
-const { tipoQuarto } = require('../data/database');
-const ApiError = require('../errors/ApiError'); // Importa o ApiError
 
 router.use('/tipos-quarto', authMiddleware);
 
@@ -25,4 +26,4 @@ router.get('/tipos-quarto', (req, res) => {
     res.status(200).json(tipoQuarto);
 });
 
-module.exports = router;
+export default router;

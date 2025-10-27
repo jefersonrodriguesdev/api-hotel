@@ -1,37 +1,40 @@
-const express = require('express');
-require('express-async-errors'); // Importa e já configura o 'express-async-errors'
-const app = express();
-const ApiError = require('./errors/ApiError');
-const errorHandler = require('./middleware/errorHandler.middleware');
+// src/app.js
+import express from 'express';
+import 'express-async-errors';
+import ApiError from './errors/ApiError.js';
+import errorHandler from './middleware/errorHandler.middleware.js';
 
+// Vamos importar TODAS as rotas primeiro
+import tipoQuartoRoutes from './routes/tipoQuarto.routes.js';
+import quartoRoutes from './routes/quarto.routes.js';
+import clienteRoutes from './routes/cliente.routes.js';
+import reservaRoutes from './routes/reserva.routes.js';
+import usuarioRoutes from './routes/usuario.routes.js'; // A rota pública
+
+const app = express();
 app.use(express.json());
 
-// Importação das rotas
-const tipoQuartoRoutes = require('./routes/tipoQuarto.routes');
-const quartoRoutes = require('./routes/quarto.routes');
-const clienteRoutes = require('./routes/cliente.routes');
-const reservaRoutes = require('./routes/reserva.routes');
-const usuarioRoutes = require('./routes/usuario.routes');
+// 1. Registramos as rotas PÚBLICAS primeiro.
+app.use('/api/usuarios', usuarioRoutes);
 
-// Registro das rotas
+// 2. Registramos todas as rotas PROTEGIDAS depois.
 app.use('/api', tipoQuartoRoutes);
 app.use('/api', quartoRoutes);
 app.use('/api', clienteRoutes);
 app.use('/api', reservaRoutes);
-app.use('/api/usuarios', usuarioRoutes);
+
+// ---------------------------
 
 app.get('/', (req, res) => {
     res.send('Bem-vindo ao Hotel Senac!');
 });
 
-// Middleware para lidar com rotas 404 (Não Encontrado)
-// Deve ser colocado DEPOIS de todas as outras rotas
+// Middleware para lidar com rotas 404
 app.use((req, res, next) => {
     next(new ApiError("Endpoint não encontrado.", 404));
 });
 
 // Middleware de Tratamento de Erro Global
-// Deve ser o ÚLTIMO middleware registrado no Express
 app.use(errorHandler);
 
-module.exports = app;
+export default app;

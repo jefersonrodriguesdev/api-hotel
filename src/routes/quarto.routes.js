@@ -1,12 +1,15 @@
-const express = require('express');
+import express from 'express';
+import authMiddleware from '../middleware/auth.middleware.js';
+import { quartosAtivos, tipoQuarto } from '../data/database.js';
+import ApiError from '../errors/ApiError.js';
+
 const router = express.Router();
-const authMiddleware = require('../middleware/auth.middleware');
-const { quartosAtivos, tipoQuarto } = require('../data/database');
-const ApiError = require('../errors/ApiError'); // Importa o ApiError
 
 router.use('/quartos', authMiddleware);
 
+// Rotas protegidas (agora corretas)
 router.post('/quartos', (req, res) => {
+    
     const { numero, tipo, valorDiaria, status } = req.body;
 
     if (!numero || !tipo || !valorDiaria || !status) {
@@ -64,4 +67,4 @@ router.delete('/quartos/:numero', (req, res) => {
     res.status(200).json({ message: "Quarto deletado com sucesso." });
 });
 
-module.exports = router;
+export default router;

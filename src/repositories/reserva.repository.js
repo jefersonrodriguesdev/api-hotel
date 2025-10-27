@@ -1,11 +1,10 @@
-const { reservas, ReservarQuarto } = require('../data/database');
+import { reservas, ReservarQuarto } from '../data/database.js';
 
 const findConflito = async (numeroQuarto, dataEntrada, dataSaida, idExcecao = null) => {
     const dataEntradaNova = new Date(dataEntrada);
     const dataSaidaNova = new Date(dataSaida);
 
     const conflitos = reservas.filter(reserva => {
-        // Ignora a própria reserva na verificação (útil para atualização)
         if (idExcecao && reserva.id === idExcecao) {
             return false;
         }
@@ -52,7 +51,6 @@ const update = async (id, dadosReserva) => {
     if (index === -1) {
         return Promise.resolve(null);
     }
-    // Mantém dados originais que não são atualizados
     const reservaAtualizada = { ...reservas[index], ...dadosReserva };
     reservas[index] = reservaAtualizada;
     return Promise.resolve(reservaAtualizada);
@@ -67,4 +65,4 @@ const remove = async (id) => {
     return Promise.resolve(true);
 };
 
-module.exports = { findConflito, create, findAll, findById, update, remove };
+export default { findConflito, create, findAll, findById, update, remove };
