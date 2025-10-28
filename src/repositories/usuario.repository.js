@@ -1,4 +1,4 @@
-const { clientes, CadastrarCliente } = require('../data/database');
+import { clientes, CadastrarCliente } from '../data/database.js';
 
 const findByEmail = async (email) => {
     const cliente = clientes.find(c => c.email === email);
@@ -13,11 +13,11 @@ const create = async (dadosCliente) => {
         dadosCliente.nome,
         dadosCliente.email,
         dadosCliente.telefone,
-        dadosCliente.senha // Senha já virá com hash do serviço
+        dadosCliente.senha
     );
 
     clientes.push(novoCliente);
     return Promise.resolve(novoCliente);
 };
 
-module.exports = { findByEmail, create };
+export default { findByEmail, create };

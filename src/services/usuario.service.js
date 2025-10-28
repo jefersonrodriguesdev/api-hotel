@@ -1,8 +1,10 @@
-const usuarioRepository = require('../repositories/usuario.repository');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const secret = 'seu-segredo-super-secreto-para-o-jwt';
-const ApiError = require('../errors/ApiError'); // Importa o ApiError
+import 'dotenv/config';
+import usuarioRepository from '../repositories/usuario.repository.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import ApiError from '../errors/ApiError.js';
+
+const secret = process.env.JWT_SECRET;
 
 const registrarUsuario = async (dadosUsuario) => {
     const { email, senha } = dadosUsuario;
@@ -15,10 +17,18 @@ const registrarUsuario = async (dadosUsuario) => {
     const hashSenha = await bcrypt.hash(senha, 10);
     dadosUsuario.senha = hashSenha;
 
-    const novoUsuario = await usuarioRepository.create(dadosUsuario);
-    novoUsuario.senha = undefined; 
-    return novoUsuario;
-};
+const novoUsuario = await usuarioRepository.create(dadosUsuario);
+
+    const usuarioParaRetorno = {
+        id: novoUsuario.id,
+        nome: novoUsuario.nome,
+        email: novoUsuario.email,
+        telefone: novoUsuario.telefone
+    };
+    
+    return usuarioParaRetorno;
+    // -----------------------------
+};;
 
 const login = async (email, senha) => {
     const usuario = await usuarioRepository.findByEmail(email);
@@ -39,4 +49,4 @@ const login = async (email, senha) => {
     };
 };
 
-module.exports = { registrarUsuario, login };
+export default { registrarUsuario, login };

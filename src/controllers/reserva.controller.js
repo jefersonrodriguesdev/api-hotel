@@ -1,5 +1,5 @@
-const reservaService = require('../services/reserva.service');
-const ApiError = require('../errors/ApiError'); // Importa o ApiError
+import reservaService from '../services/reserva.service.js';
+import ApiError from '../errors/ApiError.js';
 
 const criarReserva = async (req, res) => {
     const { idCliente, numeroQuarto, quantidadePessoas, dataEntrada, dataSaida } = req.body;
@@ -37,7 +37,7 @@ const deletarReserva = async (req, res) => {
     return res.status(200).json({ message: "Reserva deletada com sucesso!" });
 };
 
-module.exports = {
+export default {
     criarReserva,
     listarReservas,
     buscarReservaPorId,
