@@ -20,4 +20,9 @@ const create = async (dadosCliente) => {
     return Promise.resolve(novoCliente);
 };
 
-export default { findByEmail, create };
+const findById = async (id) => {
+    const cliente = clientes.find(c => c.id === id);
+    return Promise.resolve(cliente);
+};
+
+export default { findByEmail, create, findById };
