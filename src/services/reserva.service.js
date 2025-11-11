@@ -1,7 +1,41 @@
 import quartoRepository from '../repositories/quarto.repository.js';
 import tipoQuartoRepository from '../repositories/tipoQuarto.repository.js';
 import reservaRepository from '../repositories/reserva.repository.js';
+import usuarioRepository from '../repositories/usuario.repository.js';
 import ApiError from '../errors/ApiError.js';
+
+const _populateReserva = async (reserva) => {
+    
+    const [quarto, cliente] = await Promise.all([
+        quartoRepository.findByNumero(reserva.numeroQuarto),
+        usuarioRepository.findById(reserva.idCliente)
+    ]);
+
+    
+    const clienteInfo = cliente ? {
+        id: cliente.id,
+        nome: cliente.nome, 
+        email: cliente.email,
+        telefone: cliente.telefone
+    } : null;
+
+    // Monta as informações do quarto
+    const quartoInfo = quarto ? {
+        numero: quarto.numero,
+        tipo: quarto.tipo, 
+        valorDiaria: quarto.valorDiaria
+    } : null;
+
+    return {
+        id: reserva.id,
+        dataReserva: reserva.dataReserva,
+        dataEntrada: reserva.dataEntrada,
+        dataSaida: reserva.dataSaida,
+        quantidadePessoas: reserva.quantidadePessoas,
+        quarto: quartoInfo,
+        cliente: clienteInfo
+    };
+};
 
 const criarReserva = async (dadosReserva) => {
     const { numeroQuarto, quantidadePessoas, dataEntrada, dataSaida } = dadosReserva;
