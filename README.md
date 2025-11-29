@@ -1,47 +1,51 @@
-# API de Gestão Hotel Senac
+# API de Gestão Hoteleira - Hotel Senac
 
-Projeto desenvolvido para a disciplina de Desenvolvimento de Serviços e APIs, focado na criação de uma API RESTful para o gerenciamento de reservas de um hotel, utilizando Node.js e Express.
+Projeto acadêmico desenvolvido para a disciplina de Análise e Desenvolvimento de Sistemas. Trata-se de uma API RESTful completa para o gerenciamento de um hotel, integrando funcionalidades de **Reserva de Quartos** e **Controle de Estadia**.
 
-Este projeto cobre as funcionalidades de gestão de quartos, clientes e reservas, implementando regras de negócio e autenticação de usuários.
+A aplicação foi construída seguindo arquitetura em camadas, utilizando **Node.js** com **ES Modules**, e opera com persistência de dados em memória.
 
-## Funcionalidades (Aluno 1)
+## 🚀 Funcionalidades
 
-- **Gestão de Quartos:** CRUD completo para tipos de quarto e quartos.
-- **Gestão de Usuários:** Cadastro (`/registrar`) e Autenticação (`/login`) com senhas seguras (bcrypt) e JSON Web Tokens (JWT).
-- **Gestão de Reservas:** CRUD completo para reservas.
-- **Regras de Negócio:**
-  - Não permite reservas conflitantes no mesmo período.
-  - Não permite reservas que excedam a capacidade máxima do quarto.
+O sistema integra dois módulos principais:
 
-## Arquitetura
+### Módulo 1: Gestão de Reservas
+- **Gerenciamento de Quartos:** Cadastro de quartos e tipos de quarto (Simples, Duplo, Suíte).
+- **Controle de Reservas:**
+  - Criação de reservas com validação de **capacidade** do quarto.
+  - Validação de **conflito de datas** (impede *overbooking*).
+  - Consulta detalhada (popula dados do cliente e do quarto na resposta).
+- **Gestão de Usuários do Sistema:** Cadastro e login administrativo.
 
-O projeto utiliza uma arquitetura em camadas para separação de responsabilidades:
-- **`routes`**: Define os endpoints da API.
-- **`controllers`**: Recebe as requisições e envia as respostas.
-- **`services`**: Contém toda a lógica e regras de negócio.
-- **`repositories`**: Camada de abstração para acesso aos dados (em memória).
-- **`middleware`**: Contém os middlewares de autenticação e tratamento de erros.
+### Módulo 2: Controle de Estadia e Hóspedes
+- **Gestão de Hóspedes:** CRUD completo para cadastro de hóspedes (separado dos usuários do sistema).
+- **Fluxo de Estadia:**
+  - **Check-in:** Valida hóspede e inicia a estadia.
+  - **Check-out:** Calcula automaticamente o valor total com base nas diárias e na data de saída.
+- **Relatórios:** Listagem de estadias com filtros por cliente, mês e ano.
 
-## Tecnologias Utilizadas
+## 🛠 Tecnologias e Arquitetura
 
-- Node.js
-- Express
-- jsonwebtoken (para autenticação JWT)
-- bcrypt (para hash de senhas)
-- express-async-errors (para tratamento de erros)
+- **Linguagem:** Node.js (JavaScript Moderno - ES Modules)
+- **Framework:** Express.js
+- **Segurança:**
+  - `jsonwebtoken` (JWT) para autenticação e proteção de rotas.
+  - `bcrypt` para hash seguro de senhas.
+- **Tratamento de Erros:** Middleware global de erros (`express-async-errors`) com classe personalizada `ApiError` para respostas HTTP padronizadas.
+- **Arquitetura:** Camadas bem definidas:
+  - `Routes` (Definição de endpoints)
+  - `Controllers` (Validação de entrada e resposta)
+  - `Services` (Regras de negócio complexas)
+  - `Repositories` (Acesso aos dados em memória)
 
 ---
 
-## Como Executar o Projeto
+## ⚙️ Como Executar
 
 ### Pré-requisitos
-
-- Node.js (v16 ou superior)
+- Node.js (v14 ou superior)
 - Git
 
-### 1. Clone o repositório
-
+### 1. Clonar o repositório
 ```bash
-git clone [https://github.com/jefersonrodriguesdev/api-hotel.git] (https://github.com/jefersonrodriguesdev/api-hotel.git)
-
-cd jefersonrodriguesdev/api-hotel.git
+git clone [https://github.com/SEU-USUARIO/api-hotel.git](https://github.com/SEU-USUARIO/api-hotel.git)
+cd api-hotel
