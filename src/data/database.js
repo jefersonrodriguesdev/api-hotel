@@ -14,6 +14,8 @@ export const quartosAtivos = [
 
 export const clientes = [];
 export const reservas = [];
+export const hospedes = []; 
+export const estadias = [];
 
 export class CadastrarCliente {
     constructor(id, nome, email, telefone, senha) {
@@ -36,3 +38,26 @@ export class ReservarQuarto {
         this.dataSaida = dataSaida;
     }
 };
+
+export class CadastrarHospede {
+    constructor(id, nome, cpf, telefone, email) {
+        this.id = id;
+        this.nome = nome;
+        this.cpf = cpf;
+        this.telefone = telefone;
+        this.email = email;
+    }
+}
+
+export class RegistrarEstadia {
+    constructor(id, clienteId, numeroQuarto, valorDiaria, dataEntrada, dataSaida) {
+        this.id = id;
+        this.clienteId = clienteId;
+        this.numeroQuarto = numeroQuarto;
+        this.valorDiaria = valorDiaria;
+        this.dataEntrada = dataEntrada;
+        this.dataSaida = dataSaida; 
+        this.valorTotal = 0; 
+        this.diasCobrados = 0; 
+    }
+}
