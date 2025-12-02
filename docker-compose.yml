@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # Serviço do Banco de Dados PostgreSQL
   postgres_db:
     image: postgres:15-alpine
     container_name: hotel_db_container
@@ -15,6 +16,7 @@ services:
     networks:
       - hotel-network
 
+  # Serviço da Interface Gráfica (PgAdmin)
   pgadmin:
     image: dpage/pgadmin4
     container_name: hotel_pgadmin_container

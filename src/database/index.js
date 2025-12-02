@@ -11,7 +11,6 @@ const pool = new Pool({
   database: process.env.DB_NAME,
 });
 
-// Exporta o método query para ser usado nos repositórios
 export default {
   query: (text, params) => pool.query(text, params),
 };

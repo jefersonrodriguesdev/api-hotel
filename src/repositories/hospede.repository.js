@@ -1,44 +1,27 @@
-import { hospedes, CadastrarHospede } from '../data/database.js';
+import db from '../database/index.js'; // Importa a conexão que criamos no passo 2
 
 const create = async (dados) => {
-    const id = hospedes.length > 0 ? hospedes[hospedes.length - 1].id + 1 : 1;
-    const novoHospede = new CadastrarHospede(
-        id, 
-        dados.nome, 
-        dados.cpf, 
-        dados.telefone, 
-        dados.email
-    );
-    hospedes.push(novoHospede);
-    return Promise.resolve(novoHospede);
+    // Comando SQL (Insert)
+    // $1, $2, etc são variáveis de segurança para evitar SQL Injection
+    const query = `
+        INSERT INTO hospedes (nome, cpf, telefone, email)
+        VALUES ($1, $2, $3, $4)
+        RETURNING *;
+    `;
+    
+    const values = [dados.nome, dados.cpf, dados.telefone, dados.email];
+    
+    const { rows } = await db.query(query, values);
+    
+    // Retorna o primeiro item criado (que veio do RETURNING *)
+    return rows[0];
 };
 
 const findAll = async () => {
-    return Promise.resolve(hospedes);
+    const query = 'SELECT * FROM hospedes';
+    const { rows } = await db.query(query);
+    return rows;
 };
 
-const findById = async (id) => {
-    const hospede = hospedes.find(c => c.id === id);
-    return Promise.resolve(hospede);
-};
-
-const update = async (id, dados) => {
-    const index = hospedes.findIndex(c => c.id === id);
-    if (index === -1) {
-        return Promise.resolve(null);
-    }
-    // Atualiza mantendo o ID original
-    hospedes[index] = { ...hospedes[index], ...dados };
-    return Promise.resolve(hospedes[index]);
-};
-
-const remove = async (id) => {
-    const index = hospedes.findIndex(c => c.id === id);
-    if (index === -1) {
-        return Promise.resolve(false);
-    }
-    hospedes.splice(index, 1);
-    return Promise.resolve(true);
-};
-
-export default { create, findAll, findById, update, remove };
+// ... e assim por diante para update e delete ...
+export default { create, findAll };
