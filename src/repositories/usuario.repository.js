@@ -1,30 +1,47 @@
 import db from '../database/index.js';
 
 const findByEmail = async (email) => {
-    // Busca usuário pelo email
     const query = 'SELECT * FROM usuarios WHERE email = $1';
     const { rows } = await db.query(query, [email]);
     return rows[0];
 };
 
 const findById = async (id) => {
-    // Busca usuário pelo ID
     const query = 'SELECT * FROM usuarios WHERE id = $1';
     const { rows } = await db.query(query, [id]);
     return rows[0];
 };
 
+
+const findByGoogleId = async (googleId) => {
+    const query = 'SELECT * FROM usuarios WHERE google_id = $1';
+    const { rows } = await db.query(query, [googleId]);
+    return rows[0];
+};
+
 const create = async (dados) => {
-    // Insere novo usuário e retorna os dados criados (RETURNING *)
+    
     const query = `
-        INSERT INTO usuarios (nome, email, telefone, senha)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO usuarios (nome, email, telefone, senha, google_id)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING *;
     `;
-    const values = [dados.nome, dados.email, dados.telefone, dados.senha];
+    const values = [
+        dados.nome, 
+        dados.email, 
+        dados.telefone || null, 
+        dados.senha || null, 
+        dados.googleId || null
+    ];
     
     const { rows } = await db.query(query, values);
     return rows[0];
 };
 
-export default { findByEmail, findById, create };
+const updateGoogleId = async (id, googleId) => {
+    const query = 'UPDATE usuarios SET google_id = $1 WHERE id = $2 RETURNING *';
+    const { rows } = await db.query(query, [googleId, id]);
+    return rows[0];
+};
+
+export default { findByEmail, findById, findByGoogleId, create, updateGoogleId };

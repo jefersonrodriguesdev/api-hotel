@@ -1,6 +1,8 @@
 import express from 'express';
 import 'express-async-errors';
-
+import passport from 'passport';
+import './config/passport.js'; 
+import authRoutes from './routes/auth.routes.js';
 
 import ApiError from './errors/ApiError.js';
 import errorHandler from './middleware/errorHandler.middleware.js';
@@ -16,6 +18,8 @@ import estadiaRoutes from './routes/estadia.routes.js';
 const app = express();
 app.use(express.json());
 
+app.use(passport.initialize());
+app.use('/api/auth', authRoutes);
 
 app.use('/api/usuarios', usuarioRoutes);
 
