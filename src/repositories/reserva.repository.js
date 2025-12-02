@@ -1,21 +1,13 @@
 import db from '../database/index.js';
 
-const findConflito = async (numeroQuarto, dataEntrada, dataSaida, idExcecao = null) => {
-    let query = `
+const findConflito = async (numeroQuarto, dataEntrada, dataSaida) => {
+    const query = `
         SELECT * FROM reservas 
         WHERE numero_quarto = $1 
         AND (data_entrada < $3 AND data_saida > $2)
     `;
-    
-    const values = [numeroQuarto, dataEntrada, dataSaida];
-
-    // Se for atualização (PUT), ignoramos a própria reserva no conflito
-    if (idExcecao) {
-        query += ` AND id != $4`;
-        values.push(idExcecao);
-    }
-
-    const { rows } = await db.query(query, values);
+    // Lógica: (NovaEntrada < VelhaSaida) AND (NovaSaida > VelhaEntrada)
+    const { rows } = await db.query(query, [numeroQuarto, dataEntrada, dataSaida]);
     return rows; // Retorna array de conflitos (se vazio, ok)
 };
 
