@@ -1,37 +1,36 @@
-import { estadias, RegistrarEstadia } from '../data/database.js';
-
-const create = async (dados) => {
-    const id = estadias.length > 0 ? estadias[estadias.length - 1].id + 1 : 1;
-    
-    const novaEstadia = new RegistrarEstadia(
-        id, 
-        dados.clienteId, 
-        dados.numeroQuarto, 
-        dados.valorDiaria, 
-        dados.dataEntrada, 
-        null // Data de saída inicia nula
-    );
-    estadias.push(novaEstadia);
-    return Promise.resolve(novaEstadia);
+import db from '../database/index.js';
+const listarRelatorio = async (filtros) => {
+const { clienteId, mes, ano } = filtros;
+// Começamos selecionando tudo
+let query = 'SELECT * FROM estadias WHERE 1=1';
+let values = [];
+let contador = 1;
+// Se 8ver filtro de Cliente, adicionamos no SQL
+if (clienteId) {
+query += ` AND id_cliente = $${contador}`;
+values.push(clienteId);
+contador++;
+}
+// Se 8ver filtro de Ano, adicionamos
+if (ano) {
+query += ` AND EXTRACT(YEAR FROM data_entrada) = $${contador}`;
+values.push(ano);
+contador++;
+}
+// Se 8ver filtro de Mês, adicionamos
+if (mes) {
+query += ` AND EXTRACT(MONTH FROM data_entrada) = $${contador}`;
+values.push(mes);
+contador++;
+}
+const { rows } = await db.query(query, values);
+// Reu8lizamos a formatação manual para manter o padrão
+return rows.map(row => ({
+id: row.id,
+clienteId: row.id_cliente,
+numeroQuarto: row.numero_quarto,
+dataEntrada: row.data_entrada,
+valorTotal: row.valor_total
+}));
 };
-
-const findAll = async () => {
-    return Promise.resolve(estadias);
-};
-
-const findById = async (id) => {
-    const estadia = estadias.find(e => e.id === id);
-    return Promise.resolve(estadia);
-};
-
-const update = async (id, dados) => {
-    const index = estadias.findIndex(e => e.id === id);
-    if (index === -1) {
-        return Promise.resolve(null);
-    }
-    // Mescla os dados existentes com os novos (ex: dataSaida, valorTotal)
-    estadias[index] = { ...estadias[index], ...dados };
-    return Promise.resolve(estadias[index]);
-};
-
-export default { create, findAll, findById, update };
+export default { listarRelatorio };

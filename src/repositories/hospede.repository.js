@@ -1,44 +1,46 @@
-import { hospedes, CadastrarHospede } from '../data/database.js';
-
+import db from '../database/index.js';
 const create = async (dados) => {
-    const id = hospedes.length > 0 ? hospedes[hospedes.length - 1].id + 1 : 1;
-    const novoHospede = new CadastrarHospede(
-        id, 
-        dados.nome, 
-        dados.cpf, 
-        dados.telefone, 
-        dados.email
-    );
-    hospedes.push(novoHospede);
-    return Promise.resolve(novoHospede);
+// Comando SQL para inserir um novo hóspede na tabela
+const query = `
+INSERT INTO hospedes (nome, cpf, telefone, email)
+VALUES ($1, $2, $3, $4)
+RETURNING *;
+`;
+// Organiza os dados que vieram do formulário
+const values = [dados.nome, dados.cpf, dados.telefone, dados.email];
+// Executa no banco
+const { rows } = await db.query(query, values);
+// Retorna o hóspede criado
+return rows[0];
 };
-
 const findAll = async () => {
-    return Promise.resolve(hospedes);
+// Busca TODOS os hóspedes
+const query = 'SELECT * FROM hospedes';
+const { rows } = await db.query(query);
+return rows;
 };
-
 const findById = async (id) => {
-    const hospede = hospedes.find(c => c.id === id);
-    return Promise.resolve(hospede);
+// Busca APENAS UM hóspede pelo ID
+const query = 'SELECT * FROM hospedes WHERE id = $1';
+const { rows } = await db.query(query, [id]);
+return rows[0];
 };
-
 const update = async (id, dados) => {
-    const index = hospedes.findIndex(c => c.id === id);
-    if (index === -1) {
-        return Promise.resolve(null);
-    }
-    // Atualiza mantendo o ID original
-    hospedes[index] = { ...hospedes[index], ...dados };
-    return Promise.resolve(hospedes[index]);
+// Atualiza os dados do hóspede
+const query = `
+UPDATE hospedes
+SET nome = $1, cpf = $2, telefone = $3, email = $4
+WHERE id = $5
+RETURNING *;
+`;
+const values = [dados.nome, dados.cpf, dados.telefone, dados.email, id];
+const { rows } = await db.query(query, values);
+return rows[0];
 };
-
 const remove = async (id) => {
-    const index = hospedes.findIndex(c => c.id === id);
-    if (index === -1) {
-        return Promise.resolve(false);
-    }
-    hospedes.splice(index, 1);
-    return Promise.resolve(true);
+// Deleta o hóspede
+const query = 'DELETE FROM hospedes WHERE id = $1';
+await db.query(query, [id]);
+return true;
 };
-
 export default { create, findAll, findById, update, remove };
