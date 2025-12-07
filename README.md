@@ -1,51 +1,141 @@
-# API de Gestão Hoteleira - Hotel Senac
+# API de Gestão Hoteleira – Hotel Senac
 
-Projeto acadêmico desenvolvido para a disciplina de Análise e Desenvolvimento de Sistemas. Trata-se de uma API RESTful completa para o gerenciamento de um hotel, integrando funcionalidades de **Reserva de Quartos** e **Controle de Estadia**.
+Projeto acadêmico desenvolvido para a disciplina de Análise e Desenvolvimento de Sistemas.  
+Trata-se de uma **API RESTful** completa para o gerenciamento de um hotel, integrando funcionalidades de:
 
-A aplicação foi construída seguindo arquitetura em camadas, utilizando **Node.js** com **ES Modules**, e opera com persistência de dados em memória.
+- **Reserva de Quartos** (Aluno 1)
+- **Controle de Estadia e Hóspedes** (Aluno 2)
 
-## 🚀 Funcionalidades
-
-O sistema integra dois módulos principais:
-
-### Módulo 1: Gestão de Reservas
-- **Gerenciamento de Quartos:** Cadastro de quartos e tipos de quarto (Simples, Duplo, Suíte).
-- **Controle de Reservas:**
-  - Criação de reservas com validação de **capacidade** do quarto.
-  - Validação de **conflito de datas** (impede *overbooking*).
-  - Consulta detalhada (popula dados do cliente e do quarto na resposta).
-- **Gestão de Usuários do Sistema:** Cadastro e login administrativo.
-
-### Módulo 2: Controle de Estadia e Hóspedes
-- **Gestão de Hóspedes:** CRUD completo para cadastro de hóspedes (separado dos usuários do sistema).
-- **Fluxo de Estadia:**
-  - **Check-in:** Valida hóspede e inicia a estadia.
-  - **Check-out:** Calcula automaticamente o valor total com base nas diárias e na data de saída.
-- **Relatórios:** Listagem de estadias com filtros por cliente, mês e ano.
-
-## 🛠 Tecnologias e Arquitetura
-
-- **Linguagem:** Node.js (JavaScript Moderno - ES Modules)
-- **Framework:** Express.js
-- **Segurança:**
-  - `jsonwebtoken` (JWT) para autenticação e proteção de rotas.
-  - `bcrypt` para hash seguro de senhas.
-- **Tratamento de Erros:** Middleware global de erros (`express-async-errors`) com classe personalizada `ApiError` para respostas HTTP padronizadas.
-- **Arquitetura:** Camadas bem definidas:
-  - `Routes` (Definição de endpoints)
-  - `Controllers` (Validação de entrada e resposta)
-  - `Services` (Regras de negócio complexas)
-  - `Repositories` (Acesso aos dados em memória)
+A aplicação segue arquitetura em camadas, utiliza **Node.js + Express** com **ES Modules** e faz **persistência de dados em banco PostgreSQL**.
 
 ---
 
-## ⚙️ Como Executar
+## 🚀 Funcionalidades
 
-### Pré-requisitos
-- Node.js (v14 ou superior)
-- Git
+### Módulo 1 – Reserva de Quartos (Aluno 1)
 
-### 1. Clonar o repositório
-```bash
-git clone [https://github.com/SEU-USUARIO/api-hotel.git](https://github.com/SEU-USUARIO/api-hotel.git)
-cd api-hotel
+- **Tipos de Quarto**
+  - Cadastro de tipos (Simples, Duplo, Suíte) com capacidade de hóspedes.
+  - Evita cadastro duplicado de tipo.
+- **Quartos**
+  - Cadastro de quartos com número, tipo, valor da diária e status.
+  - Validação se o tipo de quarto existe.
+- **Reservas**
+  - Criação de reservas relacionando **quarto** e **cliente**.
+  - Regras de negócio:
+    - Validação de **capacidade** de pessoas do quarto.
+    - Validação de **conflito de datas** para evitar overbooking.
+  - CRUD completo com busca por ID.
+- **Usuários do Sistema**
+  - Cadastro e login com e-mail e senha.
+  - Autenticação com **JWT**.
+  - Integração com **OAuth Google** (login com conta Google).
+
+---
+
+### Módulo 2 – Controle de Estadia (Aluno 2)
+
+- **Hóspedes (Clientes do Hotel)**
+  - CRUD completo com nome, CPF, telefone e e-mail.
+  - Separado dos usuários do sistema (quem usa a API).
+- **Estadias**
+  - **Check-in:**
+    - Valida se o hóspede existe.
+    - Registra início da estadia.
+  - **Check-out:**
+    - Calcula automaticamente:
+      - diferença entre datas,
+      - quantidade de diárias cobradas (no mínimo 1),
+      - valor total da estadia (`diasCobrados × valorDiaria`).
+    - Atualiza a estadia no banco com `dataSaida`, `diasCobrados` e `valorTotal`.
+- **Relatórios**
+  - Relatório de estadias com filtros por:
+    - `clienteId` (opcional),
+    - mês,
+    - ano.
+
+---
+
+## 🛠 Tecnologias e Arquitetura
+
+- **Linguagem:** Node.js (ES Modules)
+- **Framework:** Express.js
+- **Banco de Dados:** PostgreSQL (via `pg`)
+- **Segurança:**
+  - `jsonwebtoken` para autenticação JWT.
+  - `bcrypt` para hash de senhas.
+  - `passport` + `passport-google-oauth20` para login com Google.
+- **Documentação:**
+  - `swagger-ui-express` servindo um documento **OpenAPI 3.0** em `/api/docs`.
+- **Tratamento de Erros:**
+  - `express-async-errors` para capturar exceções assíncronas.
+  - Classe `ApiError` para respostas padronizadas com `statusCode` e `message`.
+- **Arquitetura em Camadas:**
+  - `routes/` → define os endpoints REST.
+  - `controllers/` → lidam com `req`/`res` e chamam os services.
+  - `services/` → regras de negócio e validações.
+  - `repositories/` → acesso ao banco PostgreSQL.
+  - `database/` → configuração do pool de conexão e script de criação de tabelas.
+  - `middleware/` → autenticação JWT e tratamento de erros.
+
+---
+
+## 📁 Estrutura Simplificada do Projeto
+
+```text
+src/
+  app.js              # Configuração da aplicação Express
+  server.js           # Sobe o servidor HTTP
+
+  config/
+    passport.js       # Estratégia de OAuth Google
+    swagger.js        # Configuração do Swagger UI
+
+  database/
+    index.js          # Conexão com PostgreSQL
+    init.js           # Script para criar as tabelas
+
+  routes/
+    auth.routes.js
+    usuario.routes.js
+    tipoQuarto.routes.js
+    quarto.routes.js
+    hospede.routes.js
+    reserva.routes.js
+    estadia.routes.js
+
+  controllers/
+    usuario.controller.js
+    tipoQuarto.controller.js
+    quarto.controller.js
+    hospede.controller.js
+    reserva.controller.js
+    estadia.controller.js
+    relatorio.controller.js
+
+  services/
+    usuario.service.js
+    tipoQuarto.service.js
+    quarto.service.js
+    hospede.service.js
+    reserva.service.js
+    estadia.service.js
+    relatorio.service.js
+
+  repositories/
+    usuario.repository.js
+    tipoQuarto.repository.js
+    quarto.repository.js
+    hospede.repository.js
+    reserva.repository.js
+    estadia.repository.js
+
+  middleware/
+    auth.middleware.js
+    errorHandler.middleware.js
+
+  errors/
+    ApiError.js
+
+  docs/
+    openapi.json       # Especificação OpenAPI para o Swagger
