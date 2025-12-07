@@ -1,57 +1,50 @@
-import hospedeService from '../services/hospede.service.js';
+import hospedeRepository from '../repositories/hospede.repository.js';
+import ApiError from '../errors/ApiError.js';
 
-const criar = async (req, res, next) => {
-  try {
-    const hospede = await hospedeService.criarHospede(req.body);
-    res.status(201).json({ message: "Hóspede cadastrado com sucesso!", hospede });
-  } catch (err) {
-    next(err);
+const criarHospede = async (dados) => {
+  const { nome, cpf, telefone, email } = dados;
+
+  if (!nome || !cpf || !telefone || !email) {
+    throw new ApiError(
+      "Todos os campos (nome, cpf, telefone, email) são obrigatórios.",
+      400
+    );
   }
+
+  const novoHospede = await hospedeRepository.create(dados);
+  return novoHospede;
 };
 
-const listar = async (req, res, next) => {
-  try {
-    const lista = await hospedeService.listarHospedes();
-    res.status(200).json(lista);
-  } catch (err) {
-    next(err);
-  }
+const listarHospedes = async () => {
+  return await hospedeRepository.findAll();
 };
 
-const buscarPorId = async (req, res, next) => {
-  try {
-    const id = parseInt(req.params.id);
-    const hospede = await hospedeService.buscarHospedePorId(id);
-    res.status(200).json(hospede);
-  } catch (err) {
-    next(err);
+const buscarHospedePorId = async (id) => {
+  const hospede = await hospedeRepository.findById(id);
+  if (!hospede) {
+    throw new ApiError("Hóspede não encontrado.", 404);
   }
+  return hospede;
 };
 
-const atualizar = async (req, res, next) => {
-  try {
-    const id = parseInt(req.params.id);
-    const hospede = await hospedeService.atualizarHospede(id, req.body);
-    res.status(200).json({ message: "Hóspede atualizado!", hospede });
-  } catch (err) {
-    next(err);
-  }
+const atualizarHospede = async (id, dados) => {
+  await buscarHospedePorId(id); // garante que existe
+  const atualizado = await hospedeRepository.update(id, dados);
+  return atualizado;
 };
 
-const deletar = async (req, res, next) => {
-  try {
-    const id = parseInt(req.params.id);
-    const resultado = await hospedeService.deletarHospede(id);
-    res.status(200).json(resultado);
-  } catch (err) {
-    next(err);
+const deletarHospede = async (id) => {
+  const sucesso = await hospedeRepository.remove(id);
+  if (!sucesso) {
+    throw new ApiError("Hóspede não encontrado.", 404);
   }
+  return { message: "Hóspede removido com sucesso." };
 };
 
-export default { 
-  criar, 
-  listar, 
-  buscarPorId,
-  atualizar, 
-  deletar 
+export default {
+  criarHospede,
+  listarHospedes,
+  buscarHospedePorId,
+  atualizarHospede,
+  deletarHospede
 };

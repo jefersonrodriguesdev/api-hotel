@@ -1,9 +1,24 @@
 import db from '../database/index.js';
 
+// helper para converter snake_case -> camelCase
+const mapEstadia = (row) => {
+  if (!row) return null;
+  return {
+    id: row.id,
+    clienteId: row.id_cliente,
+    numeroQuarto: row.numero_quarto,
+    valorDiaria: row.valor_diaria,
+    dataEntrada: row.data_entrada,
+    dataSaida: row.data_saida,
+    valorTotal: row.valor_total,
+    diasCobrados: row.dias_cobrados
+  };
+};
+
 const create = async (dados) => {
   const query = `
     INSERT INTO estadias 
-    (id_cliente, numero_quarto, valor_diaria, data_entrada)
+      (id_cliente, numero_quarto, valor_diaria, data_entrada)
     VALUES ($1, $2, $3, $4)
     RETURNING *;
   `;
@@ -16,12 +31,12 @@ const create = async (dados) => {
   ];
 
   const { rows } = await db.query(query, values);
-  return rows[0];
+  return mapEstadia(rows[0]);
 };
 
 const findAll = async () => {
   const { rows } = await db.query('SELECT * FROM estadias');
-  return rows;
+  return rows.map(mapEstadia);
 };
 
 const findById = async (id) => {
@@ -29,7 +44,7 @@ const findById = async (id) => {
     'SELECT * FROM estadias WHERE id = $1',
     [id]
   );
-  return rows[0];
+  return mapEstadia(rows[0]);
 };
 
 const update = async (id, dados) => {
@@ -48,7 +63,7 @@ const update = async (id, dados) => {
   ];
 
   const { rows } = await db.query(query, values);
-  return rows[0];
+  return mapEstadia(rows[0]);
 };
 
 export default { create, findAll, findById, update };
