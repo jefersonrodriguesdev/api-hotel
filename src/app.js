@@ -4,6 +4,9 @@ import passport from 'passport';
 import './config/passport.js'; 
 import authRoutes from './routes/auth.routes.js';
 
+import { swaggerUi, swaggerDocument } from './config/swagger.js';
+
+
 import ApiError from './errors/ApiError.js';
 import errorHandler from './middleware/errorHandler.middleware.js';
 
@@ -18,6 +21,8 @@ const app = express();
 
 app.use(express.json());
 
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 app.use(passport.initialize());
 app.use('/api/auth', authRoutes);
 
@@ -28,7 +33,6 @@ app.use('/api', quartoRoutes);
 app.use('/api', reservaRoutes);
 app.use('/api', hospedeRoutes);
 app.use('/api', estadiaRoutes);
-
 
 app.get('/', (req, res) => {
     res.send('Bem-vindo ao Hotel Senac!');
